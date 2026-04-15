@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+settings.R
+settings.py
+*.html
+*.md
+*.ini
+/log/
+/lss_cache/
+__pycache__
