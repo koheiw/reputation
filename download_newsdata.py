@@ -4,8 +4,7 @@ import configparser
 from pymongo import MongoClient, errors
 from newsdataapi import NewsDataApiClient
 
-
-def download(col):
+def download(date, col):
     
     col.create_index("article_id", unique = True)
     
@@ -14,7 +13,8 @@ def download(col):
     page = None
     last = 0
     while True:
-        data = api.latest_api(domainurl = "manilatimes.net", page = page)
+        data = api.archive_api(domainurl = "inquirer.net", page = page, sort = "pubdateasc",
+                               from_date = date[0].isoformat()[0:10], to_date = date[1].isoformat()[0:10])
         total = data['totalResults']
         articles = data['results']
         inserted = 0;
@@ -44,7 +44,12 @@ if __name__ == "__main__":
     con = MongoClient('192.168.10.101', 27017)
     db = con.reputation
 
-    
-    download(db.newsdata)
-    #if not page:
-    #    break
+    cal = calendar.Calendar()
+    for year in range(2025, 2027):
+        for month in range(1, 13):
+            date = (datetime.datetime(year, month, 1), 
+                    datetime.datetime(year, month, max([d for d in cal.itermonthdays(year, month)])))
+            print(f"{date[0].isoformat()[0:10]} to {date[1].isoformat()[0:10]}")
+            download(date, db.newsdata)
+
+    con.close()

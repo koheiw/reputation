@@ -48,7 +48,7 @@ if __name__ == "__main__":
         for month in range(4, 13):
             date = (datetime.datetime(year, month, 1), 
                     datetime.datetime(year, month, max([d for d in cal.itermonthdays(year, month)])))
-            print(f"{date[0].isoformat()} to {date[1].isoformat()}")
+            print(f"{date[0].isoformat()[0:10]} to {date[1].isoformat()[0:10]}")
             download(date, db.gnews)
 
     con.close()
