@@ -9,9 +9,12 @@ def check_log(url, date, col):
   date = (datetime.datetime.strptime(date[0], "%Y-%m-%d"),
           datetime.datetime.strptime(date[1], "%Y-%m-%d"))
   res = col.find_one(
-      {"url": url, "date": date, "complete": True}
+      {"url": url, "date": date}
   )
-  return res != None
+  if res == None:
+    return 0
+  else:
+    return res["total"]
   
 def save_log(url, date, total, col):
   
@@ -19,11 +22,10 @@ def save_log(url, date, total, col):
   
   date = (datetime.datetime.strptime(date[0], "%Y-%m-%d"),
           datetime.datetime.strptime(date[1], "%Y-%m-%d"))
-          
+  
   col.update_one(
       {"url": url, "date": date}, 
-      {"$set": {"complete": date[1] < datetime.date.today(), 
-                "total": total,
+      {"$set": {"total": total,
                 "timestamp": datetime.datetime.now()}}, 
        upsert = True
   )
@@ -71,12 +73,13 @@ if __name__ == "__main__":
     url = "inquirer.net"
     cal = calendar.Calendar()
     for year in range(2024, 2025):
-        for month in range(12, 13):
+        for month in range(5, 13):
             date = (datetime.datetime(year, month, 1), 
                     datetime.datetime(year, month, max([d for d in cal.itermonthdays(year, month)])))
             date = (date[0].isoformat()[0:10], date[1].isoformat()[0:10])
-            if (check_log(url, date, db.log)):
-              print(f"Skip {date[0]} to {date[1]}")
+            total = check_log(url, date, db.log)
+            if (total > 0):
+              print(f"Skip {date[0]} to {date[1]} {total}")
               continue
             print(f"Download {date[0]} to {date[1]}")  
             total = download(url, date, db.newsdata)
