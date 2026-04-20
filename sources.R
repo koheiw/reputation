@@ -15,6 +15,9 @@ lis <- lapply(file, function(f) {
       x
     }
   })
+  tmp$priority <- as.numeric(tmp$priority)
+  tmp$total_article <- as.integer(tmp$total_article)
+  tmp <- tmp[order(tmp$priority),]
   return(tmp)
 })
 
