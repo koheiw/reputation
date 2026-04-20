@@ -22,7 +22,7 @@ def save_log(url, date, total, col):
   
   date = (datetime.datetime.strptime(date[0], "%Y-%m-%d"),
           datetime.datetime.strptime(date[1], "%Y-%m-%d"))
-  
+
   col.update_one(
       {"url": url, "date": date}, 
       {"$set": {"total": total,
