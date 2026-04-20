@@ -70,10 +70,15 @@ if __name__ == "__main__":
     con = MongoClient('192.168.10.101', 27017)
     db = con.reputation
     
-    url = "inquirer.net"
+    #url = "inquirer.net"
+    #url = "mb.com.ph"
+    # ulr = "bandera.inquirer.net"
+    url = "mediaindonesia.com"
+    #url = "republika.co.id"
+    
     cal = calendar.Calendar()
-    for year in range(2024, 2025):
-        for month in range(5, 13):
+    for year in range(2025, 2026):
+        for month in range(1, 13):
             date = (datetime.datetime(year, month, 1), 
                     datetime.datetime(year, month, max([d for d in cal.itermonthdays(year, month)])))
             date = (date[0].isoformat()[0:10], date[1].isoformat()[0:10])
