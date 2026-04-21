@@ -41,6 +41,10 @@ def download(url, date, col):
     data = api.archive_api(domainurl = url, page = page, sort = "pubdateasc",
                  from_date = date[0], to_date = date[1])
     total = data['totalResults']
+    
+    if (total > 10000):
+      sys.exit("More than 10000 articles")
+
     articles = data['results']
     inserted = 0;
     for i in range(len(articles)):
