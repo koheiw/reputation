@@ -1,4 +1,4 @@
-import calendar
+import pandas as pd
 import datetime, time
 import configparser
 from pymongo import MongoClient, errors
@@ -7,9 +7,9 @@ from newsdataapi import NewsDataApiClient
 def check_log(url, date, col):
   
   date = (datetime.datetime.strptime(date[0], "%Y-%m-%d"),
-          datetime.datetime.strptime(date[1], "%Y-%m-%d"))
+      datetime.datetime.strptime(date[1], "%Y-%m-%d"))
   res = col.find_one(
-      {"url": url, "date": date}
+    {"url": url, "date": date}
   )
   if res == None:
     return 0
@@ -24,70 +24,74 @@ def save_log(url, date, total, col):
           datetime.datetime.strptime(date[1], "%Y-%m-%d"))
 
   col.update_one(
-      {"url": url, "date": date}, 
-      {"$set": {"total": total,
-                "timestamp": datetime.datetime.now()}}, 
-       upsert = True
+    {"url": url, "date": date}, 
+    {"$set": {"total": total,
+        "timestamp": datetime.datetime.now()}}, 
+     upsert = True
   )
 
 def download(url, date, col):
+  
+  col.create_index("article_id", unique = True)
+  api = NewsDataApiClient(apikey = config['newsdata']['key'])
+  
+  page = None
+  last = 0
+  while True:
+    data = api.archive_api(domainurl = url, page = page, sort = "pubdateasc",
+                 from_date = date[0], to_date = date[1])
+    total = data['totalResults']
+    articles = data['results']
+    inserted = 0;
+    for i in range(len(articles)):
+      
+      articles[i]['pubDate'] = datetime.datetime.fromisoformat(articles[i]['pubDate'])
+      res = col.update_one(
+        {"id": articles[i]['article_id']}, 
+        {"$set": articles[i]}, 
+         upsert = True
+      )
+      inserted += 1 - res.matched_count
+      
+    last += len(articles)   
+    print(f"{last}/{total}: {inserted} inserted")
+    page = data['nextPage']
+    if not page:
+      break
+    time.sleep(1)
     
-    col.create_index("article_id", unique = True)
-    api = NewsDataApiClient(apikey = config['newsdata']['key'])
-    
-    page = None
-    last = 0
-    while True:
-        data = api.archive_api(domainurl = url, page = page, sort = "pubdateasc",
-                               from_date = date[0], to_date = date[1])
-        total = data['totalResults']
-        articles = data['results']
-        inserted = 0;
-        for i in range(len(articles)):
-            
-            articles[i]['pubDate'] = datetime.datetime.fromisoformat(articles[i]['pubDate'])
-            res = col.update_one(
-                {"id": articles[i]['article_id']}, 
-                {"$set": articles[i]}, 
-                 upsert = True
-            )
-            inserted += 1 - res.matched_count
-            
-        last += len(articles)     
-        print(f"{last}/{total}: {inserted} inserted")
-        page = data['nextPage']
-        if not page:
-            break
-        time.sleep(1)
-        
-    return total
+  return total
 
 if __name__ == "__main__":
+  
+  config = configparser.ConfigParser()
+  config.read("settings.ini")
+  
+  con = MongoClient('192.168.10.101', 27017)
+  db = con.reputation
+  
+  date_from = '2024-06-01'
+  date_to = '2025-12-31'
+  
+  url = ["inquirer.net",
+         "mb.com.ph",
+         "bandera.inquirer.net",
+         "mediaindonesia.com",
+         "republika.co.id"]
+  
+  for u in url:
+    df = pd.DataFrame()
+    df["from"] = pd.date_range(date_from, date_to, freq = 'MS')
+    df["to"] = pd.date_range(date_from, date_to, freq = 'MS') + pd.offsets.MonthEnd(0)
     
-    config = configparser.ConfigParser()
-    config.read("settings.ini")
-    
-    con = MongoClient('192.168.10.101', 27017)
-    db = con.reputation
-    
-    #url = "inquirer.net"
-    #url = "mb.com.ph"
-    # ulr = "bandera.inquirer.net"
-    url = "mediaindonesia.com"
-    #url = "republika.co.id"
-    
-    cal = calendar.Calendar()
-    for year in range(2025, 2026):
-        for month in range(1, 13):
-            date = (datetime.datetime(year, month, 1), 
-                    datetime.datetime(year, month, max([d for d in cal.itermonthdays(year, month)])))
-            date = (date[0].isoformat()[0:10], date[1].isoformat()[0:10])
-            total = check_log(url, date, db.log)
-            if (total > 0):
-              print(f"Skip {date[0]} to {date[1]} {total}")
-              continue
-            print(f"Download {date[0]} to {date[1]}")  
-            total = download(url, date, db.newsdata)
-            save_log(url, date, total, db.log)
+    for index, row in df.iterrows():
+      date = (row["from"].strftime("%Y-%m-%d"), row["to"].strftime("%Y-%m-%d"))
+      total = check_log(u, date, db.log)
+      if (total > 0):
+        print(f"Skip {u} {date[0]} to {date[1]} {total}")
+        continue
+      print(f"Download {u} {date[0]} to {date[1]}")
+      total = download(u, date, db.newsdata)
+      save_log(u, date, total, db.log)
 
-    con.close()
+  con.close()
