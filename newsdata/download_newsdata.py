@@ -42,8 +42,8 @@ def download(url, date, col):
                  from_date = date[0], to_date = date[1])
     total = data['totalResults']
     
-    if (total > 10000):
-      sys.exit("More than 10000 articles")
+    if (total > total_limit):
+      exit(f"More than {total_limit} articles: {total}")
 
     articles = data['results']
     inserted = 0;
@@ -74,14 +74,24 @@ if __name__ == "__main__":
   con = MongoClient('192.168.10.101', 27017)
   db = con.reputation
   
-  date_from = '2024-06-01'
-  date_to = '2025-12-31'
+  #total_limit = 10000
+  #date_from = '2024-06-01'
+  #date_to = '2025-12-31'
   
+  total_limit = 20000
+  date_from = '2024-06-01'
+  date_to = '2024-06-30'
+  
+  # PH
   url = ["inquirer.net",
          "mb.com.ph",
-         "bandera.inquirer.net",
-         "mediaindonesia.com",
-         "republika.co.id"]
+         "bandera.inquirer.net"]
+  # ID
+  url = ["mediaindonesia.com",
+         "republika.co.id",
+         "news.detik.com", 
+         "liputan6.com",
+         "tribunnews.com"]
   
   for u in url:
     df = pd.DataFrame()
