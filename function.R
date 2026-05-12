@@ -2,8 +2,15 @@ source("settings.R")
 require(stringi)
 require(lubridate)
 
+lang <- c("persian" = "fa",
+  "arabic"  = "ar",
+  "english" = "en",
+  "central kurdish" = "ku",
+  "turkish" = "tr",
+  "urdu" = "ur")
+
 get_years <- function() {
-  return(2025:2025)
+  return(2024:2026)
 }
 
 get_languages <- function(source = "factiva") {

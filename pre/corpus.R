@@ -13,7 +13,15 @@ sources <- list(
            "republikain")    # Republika
 )
 
-country <- c("id")
+sources <- list(
+  "id" = c("mediaindonesia", # Media Indonasia
+           "republikain",    # Republika
+           "detik",          # Detik
+           "liputan6"),       # Liputan6
+  "ir" = "mehrnews"
+)
+
+country <- c("ir")
 for (u in country) {
   year <- get_years()
   dates <- get_date_range(paste0(min(year), "-01-01"), paste0(max(year), "-12-31"), unit = "month", size = 1)
@@ -25,8 +33,8 @@ for (u in country) {
     dir.create(paste0(DIR_DATA, "/corpus/", u), FALSE, TRUE)
     f <- paste0(DIR_DATA, "/corpus/", u, "/corpus_", from, "_", to, ".rds")
     if (file.exists(f)) {
-      cat("Skip", u, format(from), format(to), "\n")
-      next
+      #cat("Skip", u, format(from), format(to), "\n")
+      #next
     } else {
       cat("Export", u, format(from), format(to), "\n")
     }
@@ -36,7 +44,7 @@ for (u in country) {
                                           "$lte": {"$date": "%sT23:59:59Z"}}, 
                               "source_id": {"$in": %s}}', 
                             from, to, toJSON(sources[[u]])), 
-                    fields = '{"_id": 0, "id" : 1, "source_id": 1, "link": 1, 
+                    fields = '{"_id": 0, "id" : 1, "source_id": 1, "link": 1, "language": 1,
                                "content": 1, "pubDate": 1, "title": 1}')
     
     if (!nrow(tmp)) {
