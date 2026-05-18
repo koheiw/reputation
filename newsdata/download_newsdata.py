@@ -14,7 +14,7 @@ def check_log(url, date, col):
   else:
     return res["total"]
   
-def save_log(source, date, total, last, col):
+def save_log(source, date, total, col):
   
   col.create_index(["source_id", "date"], unique = True)
 
