@@ -6,8 +6,6 @@ from newsdataapi import NewsDataApiClient
 
 def check_log(url, date, col):
   
-  date = (datetime.datetime.strptime(date[0], "%Y-%m-%d"),
-      datetime.datetime.strptime(date[1], "%Y-%m-%d"))
   res = col.find_one(
     {"url": url, "date": date}
   )
@@ -19,14 +17,10 @@ def check_log(url, date, col):
 def save_log(source, date, total, last, col):
   
   col.create_index(["source_id", "date"], unique = True)
-  
-  date = (datetime.datetime.strptime(date[0], "%Y-%m-%d"),
-          datetime.datetime.strptime(date[1], "%Y-%m-%d"))
 
   col.update_one(
     {"source_id": source, "date": date}, 
     {"$set": {"total": total,
-              "complete": complete,
               "timestamp": datetime.datetime.now()}}, 
      upsert = True
   )
@@ -40,7 +34,8 @@ def download(source, date, col):
   last = 0
   while True:
     data = api.archive_api(domain = source, page = page, sort = "pubdateasc",
-                 from_date = date[0], to_date = date[1])
+                           from_date = date[0].strftime("%Y-%m-%d"), 
+                           to_date = date[1].strftime("%Y-%m-%d"))
     total = data['totalResults']
     
     if (total > total_limit):
