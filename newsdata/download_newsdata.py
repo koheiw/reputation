@@ -16,21 +16,22 @@ def check_log(url, date, col):
   else:
     return res["total"]
   
-def save_log(url, date, total, col):
+def save_log(source, date, total, last, col):
   
-  col.create_index(["url", "date"], unique = True)
+  col.create_index(["source_id", "date"], unique = True)
   
   date = (datetime.datetime.strptime(date[0], "%Y-%m-%d"),
           datetime.datetime.strptime(date[1], "%Y-%m-%d"))
 
   col.update_one(
-    {"url": url, "date": date}, 
+    {"source_id": source, "date": date}, 
     {"$set": {"total": total,
-        "timestamp": datetime.datetime.now()}}, 
+              "complete": complete,
+              "timestamp": datetime.datetime.now()}}, 
      upsert = True
   )
 
-def download(url, date, col):
+def download(source, date, col):
   
   col.create_index("article_id", unique = True)
   api = NewsDataApiClient(apikey = config['newsdata']['key'])
@@ -38,7 +39,7 @@ def download(url, date, col):
   page = None
   last = 0
   while True:
-    data = api.archive_api(domainurl = url, page = page, sort = "pubdateasc",
+    data = api.archive_api(domain = source, page = page, sort = "pubdateasc",
                  from_date = date[0], to_date = date[1])
     total = data['totalResults']
     
@@ -72,7 +73,7 @@ if __name__ == "__main__":
   config.read("settings.ini")
   
   con = MongoClient('192.168.10.101', 27017)
-  db = con.reputation
+  db = con.reputation_test
   
   #total_limit = 10000
   #date_from = '2024-06-01'
@@ -82,30 +83,39 @@ if __name__ == "__main__":
   date_from = '2024-06-01'
   date_to = '2024-06-30'
   
-  # PH
-  url = ["inquirer.net",
-         "mb.com.ph",
-         "bandera.inquirer.net"]
+# PH
+  source = ["inquirer",
+            "mb",
+            "bandera_inquirer"]
   # ID
-  url = ["mediaindonesia.com",
-         "republika.co.id",
-         "news.detik.com", 
-         "liputan6.com",
-         "tribunnews.com"]
+  source = ["mediaindonesia",
+            "republikain",
+            "kompas", # low coverage
+            "detik", 
+            "liputan6",
+            "tribunnews"]
   
-  for u in url:
+  # IR & IQ
+  source = [#"tasnimnews", # ended in January 2026
+            "mehrnews"]
+  #source = ["irna"]
+  
+  # IQ
+  # source = ["alsabaah.iq"]
+  
+  for s in source:
     df = pd.DataFrame()
     df["from"] = pd.date_range(date_from, date_to, freq = 'MS')
     df["to"] = pd.date_range(date_from, date_to, freq = 'MS') + pd.offsets.MonthEnd(0)
     
     for index, row in df.iterrows():
-      date = (row["from"].strftime("%Y-%m-%d"), row["to"].strftime("%Y-%m-%d"))
-      total = check_log(u, date, db.log)
+      date = (row["from"], row["to"])
+      total = check_log(s, date, db.log)
       if (total > 0):
-        print(f"Skip {u} {date[0]} to {date[1]} {total}")
+        print(f"Skip {s} {date[0]} to {date[1]} {total}")
         continue
-      print(f"Download {u} {date[0]} to {date[1]}")
-      total = download(u, date, db.newsdata)
-      save_log(u, date, total, db.log)
+      print(f"Download {s} {date[0]} to {date[1]}")
+      total = download(s, date, db.newsdata)
+      save_log(s, date, total, db.log)
 
   con.close()
