@@ -4,13 +4,13 @@ import configparser
 from pymongo import MongoClient, errors
 from newsdataapi import NewsDataApiClient
 
-def check_log(url, date, col):
+def check_log(source, date, col):
   
   res = col.find_one(
-    {"url": url, "date": date}
+    {"source_id": source, "date": date}
   )
   if res == None:
-    return 0
+    return -1
   else:
     return res["total"]
   
@@ -68,15 +68,15 @@ if __name__ == "__main__":
   config.read("settings.ini")
   
   con = MongoClient('192.168.10.101', 27017)
-  db = con.reputation_test
+  db = con.reputation
   
   #total_limit = 10000
   #date_from = '2024-06-01'
   #date_to = '2025-12-31'
   
   total_limit = 20000
-  date_from = '2024-06-01'
-  date_to = '2024-06-30'
+  date_from = '2026-01-01'
+  date_to = '2026-04-30'
   
 # PH
   source = ["inquirer",
@@ -91,9 +91,9 @@ if __name__ == "__main__":
             "tribunnews"]
   
   # IR & IQ
-  source = [#"tasnimnews", # ended in January 2026
+  source = ["tasnimnews", # ended in January 2026
             "mehrnews"]
-  #source = ["irna"]
+  source = ["irna"]
   
   # IQ
   # source = ["alsabaah.iq"]
@@ -105,11 +105,11 @@ if __name__ == "__main__":
     
     for index, row in df.iterrows():
       date = (row["from"], row["to"])
-      total = check_log(s, date, db.log)
-      if (total > 0):
-        print(f"Skip {s} {date[0]} to {date[1]} {total}")
+      done = check_log(s, date, db.log)
+      if done >= 0:
+        print(f"Skip {s} {date[0].strftime('%Y-%m-%d')} to {date[1].strftime('%Y-%m-%d')} {done}")
         continue
-      print(f"Download {s} {date[0]} to {date[1]}")
+      print(f"Download {s} {date[0].strftime('%Y-%m-%d')} to {date[1].strftime('%Y-%m-%d')}")
       total = download(s, date, db.newsdata)
       save_log(s, date, total, db.log)
 
