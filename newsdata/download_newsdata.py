@@ -15,9 +15,8 @@ def check_log(source, date, col):
     return res["total"]
   
 def save_log(source, date, total, col):
-  
-  col.create_index(["source_id", "date"], unique = True)
 
+  col.create_index(["source_id", "date"], unique = True)
   col.update_one(
     {"source_id": source, "date": date}, 
     {"$set": {"total": total,
@@ -37,10 +36,12 @@ def download(source, date, col):
                            from_date = date[0].strftime("%Y-%m-%d"), 
                            to_date = date[1].strftime("%Y-%m-%d"))
     total = data['totalResults']
+    if total == 0:
+      return total
     
-    if (total > total_limit):
+    if total > total_limit:
       exit(f"More than {total_limit} articles: {total}")
-
+    
     articles = data['results']
     inserted = 0;
     for i in range(len(articles)):
@@ -92,11 +93,11 @@ if __name__ == "__main__":
   
   # IR & IQ
   source = ["tasnimnews", # ended in January 2026
-            "mehrnews"]
-  source = ["irna"]
+            "mehrnews",
+            "irna"]
   
   # IQ
-  # source = ["alsabaah.iq"]
+  source = ["alsabaah_iq"]
   
   for s in source:
     df = pd.DataFrame()
