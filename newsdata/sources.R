@@ -1,8 +1,9 @@
 source("settings.R")
 library(jsonlite)
+library(stringi)
 
-file <- list.files("sources", pattern = ".json", full.names = TRUE)
-names(file) <- stri_match_first_regex(file, "/(.*)\\.json")[,2]
+file <- list.files("newsdata/sources", pattern = "\\.json", full.names = TRUE)
+names(file) <- stri_match_first_regex(file, "([a-z]*)\\.json")[,2]
 
 lis <- lapply(file, function(f) {
   col <- c("id", "name", "url", "icon", "priority", "description", "category",  
@@ -21,5 +22,5 @@ lis <- lapply(file, function(f) {
   return(tmp)
 })
 
-readODS::write_ods(lis, "sources/data_sources.ods")
+readODS::write_ods(lis, "newsdata/sources/data_sources.ods")
 
