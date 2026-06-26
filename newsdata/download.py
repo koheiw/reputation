@@ -74,12 +74,7 @@ if __name__ == "__main__":
   
   total_limit = 20000
   date_from = '2024-07-01'
-  date_to = '2025-06-30'
-  
-  #total_limit = 20000
-  #date_from = '2026-01-01'
-  #date_to = '2026-04-30'
-  
+  date_to = '2026-05-31'
   
   with open("sources.yaml") as stream:
       try:
@@ -87,19 +82,22 @@ if __name__ == "__main__":
       except yaml.YAMLError as e:
           print(e)
 
-  for s in source["il"]:
-    df = pd.DataFrame()
-    df["from"] = pd.date_range(date_from, date_to, freq = 'MS')
-    df["to"] = pd.date_range(date_from, date_to, freq = 'MS') + pd.offsets.MonthEnd(0)
-    
-    for index, row in df.iterrows():
-      date = (row["from"], row["to"])
-      done = check_log(s, date, db.log)
-      if done >= 0:
-        print(f"Skip {s} {date[0].strftime('%Y-%m-%d')} to {date[1].strftime('%Y-%m-%d')} {done}")
-        continue
-      print(f"Download {s} {date[0].strftime('%Y-%m-%d')} to {date[1].strftime('%Y-%m-%d')}")
-      total = download(s, date, db.newsdata)
-      save_log(s, date, total, db.log)
+  #for m in source.keys():
+  for m in ["lb", "ps", "ir", "iq", "il"]:
+    print(f"Download", m)
+    for s in source[m]:
+      df = pd.DataFrame()
+      df["from"] = pd.date_range(date_from, date_to, freq = 'MS')
+      df["to"] = pd.date_range(date_from, date_to, freq = 'MS') + pd.offsets.MonthEnd(0)
+      
+      for index, row in df.iterrows():
+        date = (row["from"], row["to"])
+        done = check_log(s, date, db.log)
+        if done >= 0:
+          print(f"Skip {s} {date[0].strftime('%Y-%m-%d')} to {date[1].strftime('%Y-%m-%d')} {done}")
+          continue
+        print(f"Download {s} {date[0].strftime('%Y-%m-%d')} to {date[1].strftime('%Y-%m-%d')}")
+        total = download(s, date, db.newsdata)
+        save_log(s, date, total, db.log)
 
   con.close()
