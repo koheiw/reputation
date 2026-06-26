@@ -1,0 +1,32 @@
+---
+title: "Summary - Newsdata.io"
+author: "Kohei Watanabe"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, dpi = 150, fig.width = 10)
+source("settings.R")
+require(ggplot2)
+require(stringi)
+
+dat <- readRDS(paste0(DIR_DATA, "/corpus/data_summary.rds"))
+lis <- yaml::read_yaml(paste0("newsdata/sources.yaml"))
+map <- rep(names(lis), lengths(lis))
+names(map) <- unlist(lis)
+```
+
+```{r eval=FALSE, include=FALSE}
+tb <- xtabs(total ~ source_id + year, dat)
+dat_csv <- data.frame(source_id = rownames(tb), 
+                      country = map[rownames(tb)],
+                      as.data.frame.matrix(tb), 
+                      total = rowSums(tb),
+                      check.names = FALSE)
+rownames(dat_csv) <- NULL
+dat_csv <- dat_csv[order(dat_csv$country),]
+write.csv(dat_csv, paste0(DIR_DATA, "/corpus/data_summary.csv"))
+```
