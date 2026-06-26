@@ -1,6 +1,7 @@
 import pandas as pd
 import datetime, time
 import configparser
+import yaml
 from pymongo import MongoClient, errors
 from newsdataapi import NewsDataApiClient
 
@@ -71,35 +72,22 @@ if __name__ == "__main__":
   con = MongoClient('192.168.10.101', 27017)
   db = con.reputation
   
-  #total_limit = 10000
-  #date_from = '2024-06-01'
-  #date_to = '2025-12-31'
-  
   total_limit = 20000
-  date_from = '2026-01-01'
-  date_to = '2026-04-30'
+  date_from = '2024-07-01'
+  date_to = '2025-06-30'
   
-# PH
-  source = ["inquirer",
-            "mb",
-            "bandera_inquirer"]
-  # ID
-  source = ["mediaindonesia",
-            "republikain",
-            "kompas", # low coverage
-            "detik", 
-            "liputan6",
-            "tribunnews"]
+  #total_limit = 20000
+  #date_from = '2026-01-01'
+  #date_to = '2026-04-30'
   
-  # IR & IQ
-  source = ["tasnimnews", # ended in January 2026
-            "mehrnews",
-            "irna"]
   
-  # IQ
-  source = ["alsabaah_iq"]
-  
-  for s in source:
+  with open("sources.yaml") as stream:
+      try:
+          source = yaml.safe_load(stream)
+      except yaml.YAMLError as e:
+          print(e)
+
+  for s in source["il"]:
     df = pd.DataFrame()
     df["from"] = pd.date_range(date_from, date_to, freq = 'MS')
     df["to"] = pd.date_range(date_from, date_to, freq = 'MS') + pd.offsets.MonthEnd(0)

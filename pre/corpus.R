@@ -6,22 +6,9 @@ library(jsonlite)
 
 con <- mongo("newsdata", db = "reputation", url = URL_MONGO)
 
-sources <- list(
-  "ph" = c("inquirer",  # Philippine Daily Inquirer (liberal)
-           "mb"),       # Manila Bulletin (pro-government)
-  "id" = c("mediaindonesia", # Media Indonasia
-           "republikain")    # Republika
-)
+sources <- yaml::read_yaml("newsdata/sources.yaml")
 
-sources <- list(
-  "id" = c("mediaindonesia", # Media Indonasia
-           "republikain",    # Republika
-           "detik",          # Detik
-           "liputan6"),       # Liputan6
-  "ir" = "mehrnews"
-)
-
-country <- c("ir")
+country <- c("ir", "lb", "iq", "il", "ps")
 for (u in country) {
   year <- get_years()
   dates <- get_date_range(paste0(min(year), "-01-01"), paste0(max(year), "-12-31"), unit = "month", size = 1)

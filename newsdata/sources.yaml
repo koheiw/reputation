@@ -1,0 +1,45 @@
+ph: 
+  - inquirer # Philippine Daily Inquirer (liberal)
+  - mb # Manila Bulletin (pro-government)
+  - bandera_inquirer
+id: 
+  - mediaindonesia # Media Indonasia
+  - republikain # Republika
+  - kompas # low coverage
+  - detik # Detik
+  - liputan6 # Liputan6
+  - tribunnews
+  
+ir: 
+  - tasnimnews # ended in January 2026
+  - mehrnews
+  - irna
+
+gn: 
+  - mirroruk,
+  #- standarduk
+  - theguardian
+
+us:
+  - theepochtimes
+  - washingtontimes
+            
+lb:
+  - almanar
+  - tayyar
+  - manartv_lb
+  
+iq:
+  - non14
+  - almadapaper
+  - azzaman
+  - alsabaah_iq
+  
+il:
+  - haaretz
+  - ynet_co
+
+ps:
+  - palinfo
+  - pnn_ps
+
