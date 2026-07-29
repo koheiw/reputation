@@ -7,7 +7,7 @@ if __name__ == "__main__":
   config = configparser.ConfigParser()
   config.read("settings.ini")
   
-  country = "de"
+  country = "cn"
   
   api = NewsDataApiClient(apikey = config['newsdata']['key'])
   data = api.sources_api(country = country)

@@ -19,14 +19,22 @@ map <- rep(names(lis), lengths(lis))
 names(map) <- unlist(lis)
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r include=FALSE}
 tb <- xtabs(total ~ source_id + year, dat)
 dat_csv <- data.frame(source_id = rownames(tb), 
                       country = map[rownames(tb)],
                       as.data.frame.matrix(tb), 
                       total = rowSums(tb),
                       check.names = FALSE)
-rownames(dat_csv) <- NULL
 dat_csv <- dat_csv[order(dat_csv$country),]
+rownames(dat_csv) <- NULL
+```
+
+```{r}
+knitr::kable(dat_csv)
+```
+
+```{r}
 write.csv(dat_csv, paste0(DIR_DATA, "/corpus/data_summary.csv"))
 ```
+

@@ -72,8 +72,8 @@ if __name__ == "__main__":
   con = MongoClient('192.168.10.101', 27017)
   db = con.reputation
   
-  total_limit = 20000
-  date_from = '2024-07-01'
+  total_limit = 30000
+  date_from = '2024-08-01'
   date_to = '2026-05-31'
   
   with open("sources.yaml") as stream:

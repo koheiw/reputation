@@ -3,7 +3,7 @@ library(jsonlite)
 library(stringi)
 
 file <- list.files("newsdata/sources", pattern = "\\.json", full.names = TRUE)
-names(file) <- stri_match_first_regex(file, "([a-z]*)\\.json")[,2]
+names(file) <- stri_match_first_regex(file, "([a-z_]*)\\.json")[,2]
 
 lis <- lapply(file, function(f) {
   col <- c("id", "name", "url", "icon", "priority", "description", "category",  

@@ -12,6 +12,7 @@ id:
   
 ir: 
   - tasnimnews # ended in January 2026
+  - tasnimnews_ir
   - mehrnews
   - irna
 
