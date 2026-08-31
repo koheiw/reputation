@@ -22,5 +22,5 @@ lis <- lapply(file, function(f) {
   return(tmp)
 })
 
-readODS::write_ods(lis, "newsdata/sources/data_sources.ods")
+readODS::write_ods(lis, file.path(DIR_DATA, paste0("data_sources_", Sys.Date(), ".ods")))
 
