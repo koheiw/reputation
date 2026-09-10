@@ -1,4 +1,4 @@
-import json, os
+import json, os, sys
 import configparser
 from newsdataapi import NewsDataApiClient
 
@@ -7,7 +7,7 @@ if __name__ == "__main__":
   config = configparser.ConfigParser()
   config.read("settings.ini")
   
-  language = "en"
+  language = sys.argv[1]
   
   for i in range(1, 21):
     file = "sources2/" + language + "_" + "%03d" % i + ".json"

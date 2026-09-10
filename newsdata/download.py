@@ -1,5 +1,5 @@
 import pandas as pd
-import datetime, time
+import datetime, time, sys
 import configparser
 import yaml
 from pymongo import MongoClient, errors
@@ -73,8 +73,8 @@ if __name__ == "__main__":
   db = con.reputation
   
   total_limit = 30000
-  date_from = '2024-08-01'
-  date_to = '2026-05-31'
+  date_from = '2024-10-01'
+  date_to = '2026-08-31'
   
   with open("sources.yaml") as stream:
       try:
@@ -82,8 +82,7 @@ if __name__ == "__main__":
       except yaml.YAMLError as e:
           print(e)
 
-  #for m in source.keys():
-  for m in ["lb", "ps", "ir", "iq", "il"]:
+  for m in sys.argv[1:]: # country code via CLI
     print(f"Download", m)
     for s in source[m]:
       df = pd.DataFrame()

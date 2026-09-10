@@ -1,4 +1,4 @@
-import json
+import json, sys
 import configparser
 from newsdataapi import NewsDataApiClient
 
@@ -7,7 +7,7 @@ if __name__ == "__main__":
   config = configparser.ConfigParser()
   config.read("settings.ini")
   
-  country = "cn"
+  country = sys.argv[1]
   
   api = NewsDataApiClient(apikey = config['newsdata']['key'])
   data = api.sources_api(country = country)
