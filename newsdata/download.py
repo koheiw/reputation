@@ -49,7 +49,7 @@ def download(source, date, col):
       
       articles[i]['pubDate'] = datetime.datetime.fromisoformat(articles[i]['pubDate'])
       res = col.update_one(
-        {"id": articles[i]['article_id']}, 
+        {"article_id": articles[i]['article_id']}, 
         {"$set": articles[i]}, 
          upsert = True
       )
@@ -69,7 +69,7 @@ if __name__ == "__main__":
   config = configparser.ConfigParser()
   config.read("settings.ini")
   
-  con = MongoClient('192.168.10.101', 27017)
+  con = MongoClient('localhost', 27017)
   db = con.reputation
   
   total_limit = 30000
