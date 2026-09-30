@@ -28,6 +28,7 @@ def save_log(source, date, total, col):
 def download(source, date, col):
   
   col.create_index("article_id", unique = True)
+  col.create_index("source_id", unique = False)
   api = NewsDataApiClient(apikey = config['newsdata']['key'])
   
   page = None
