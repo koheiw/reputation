@@ -56,3 +56,47 @@ get_date_window <- function(from, to, size = 12) {
   lis <- lapply(lis, function(x) c(x[[1]][1], x[[length(x)]][2]))
   return(lis)
 }
+
+get_language <- function(country) {
+  c("ph" = "en", 
+    "my" = "ms", 
+    "id" = "id",
+    "vn" = "vi",
+    "us" = "en",
+    "cn" = "zh")[country]
+}
+
+load_tokens <- function(from, to, country = "gb", dir = "tokens", sample = 1.0, segment = TRUE) {
+  
+  dates <- get_date_range("1977-01-01", "2050-12-31", unit = "month", size = 1) 
+  lang <- get_language(country)
+  conc <- ifelse(lang %in% c("zh", "ja"), "", " ")
+  toks <- as.tokens_xptr(as.tokens(list(), concatenator = conc))
+  for (date in dates) {
+    if (from <= date[2] && date[1] <= to) {
+      f <- paste0(DIR_DATA, "/", dir, "/", country, "/tokens_", date[1], "_", date[2] ,".rds")
+      if (file.exists(f)) {
+        message(sprintf("Load tokens %s from %s to %s in %s", country, date[1], date[2], dir))
+      } else {
+        message(sprintf("Cannot not load tokens %s from %s to %s in %s", country, date[1], date[2], dir))
+        next
+      }
+      tmp <- as.tokens_xptr(readRDS(f))
+      if (sample < 1.0) {
+        set.seed(1234)
+        id <- levels(docid(tmp))
+        tmp <- tokens_subset(tmp, docid_ %in% sample(id, length(id) * sample))
+      } 
+      toks <- c(toks, tmp)
+    }
+  }
+  if (segment)
+    toks <- tokens_segment(toks, c(".", "?", "!"), valuetype = "fixed",
+                           extract_pattern = FALSE, pattern_position = "after")
+  
+  return(toks)
+}
+
+print_log <- function(status, ...) {
+  cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), status, ..., "\n")
+}
