@@ -8,7 +8,9 @@ con <- mongo("newsdata", db = "reputation", url = URL_MONGO)
 
 sources <- yaml::read_yaml("newsdata/sources.yaml")
 
-country <- c("ir", "lb", "iq", "il", "ps")
+#country <- c("ir", "lb", "iq", "il", "ps")
+#country <- "cn"
+country <- c("my", "vn", "id", "ph")
 for (u in country) {
   year <- get_years()
   dates <- get_date_range(paste0(min(year), "-01-01"), paste0(max(year), "-12-31"), unit = "month", size = 1)
@@ -31,7 +33,7 @@ for (u in country) {
                                           "$lte": {"$date": "%sT23:59:59Z"}}, 
                               "source_id": {"$in": %s}}', 
                             from, to, toJSON(sources[[u]])), 
-                    fields = '{"_id": 0, "id" : 1, "source_id": 1, "link": 1, "language": 1,
+                    fields = '{"_id": 0, "article_id" : 1, "source_id": 1, "link": 1, "language": 1,
                                "content": 1, "pubDate": 1, "title": 1}')
     
     if (!nrow(tmp)) {
@@ -46,8 +48,8 @@ for (u in country) {
     tmp$country <- rep(u, nrow(tmp))
     tmp <- tmp[order(tmp$date),]
     
-    tmp$doc_id <- stri_trans_tolower(paste0(tmp[["source_id"]], "_", tmp[["id"]]))
-    tmp[c("id", "pubDate")] <- NULL
+    tmp$doc_id <- stri_trans_tolower(paste0(tmp[["source_id"]], "_", tmp[["article_id"]]))
+    tmp[c("article_id", "pubDate")] <- NULL
     corp <- corpus(tmp, text_field = "content")
     
     saveRDS(corp, f)

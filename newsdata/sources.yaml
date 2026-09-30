@@ -17,8 +17,8 @@ ir:
   - irna
 
 gb: 
-  - mirroruk
-  #- standarduk
+  #- mirroruk
+  - standarduk
   - theguardian
 
 us:
@@ -43,4 +43,24 @@ il:
 ps:
   - palinfo
   - pnn_ps
+
+my:
+  - kosmo
+  - sinarharian
+  - hmetro
+  - utusan
+
+vn:
+  - dantri_vn
+  - h24_vn
+  - vnexpress
+  - danviet
+
+  
+cn:
+  - xinhuanet
+  - en_people_cn
+  - bjnews
+  
+
 
