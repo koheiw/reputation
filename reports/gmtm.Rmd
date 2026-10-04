@@ -1,0 +1,37 @@
+---
+title: "GMM + LSS"
+author: "Kohei Watanabe"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, dpi = 150, fig.width = 10)
+source("settings.R")
+library(ggplot2)
+library(LSX)
+
+load(file.path(DIR_RESULT, "/awe/gmm-lss.rda"))
+```
+
+```{r}
+boxplot(lss ~ topic, dat, las = 2)
+```
+
+```{r}
+boxplot(lss ~ country, dat, las = 2)
+```
+
+```{r}
+smo <- smooth_lss(dat, "lss", group = "country", engine = "locfit")
+ggplot(smo, aes(date, fit, color = country)) +
+  geom_line()
+```
+
+```{r}
+smo <- smooth_lss(subset(dat, topic == "topic32"), "lss", group = "country", engine = "locfit")
+ggplot(smo, aes(date, fit, color = country)) +
+  geom_line()
+```
