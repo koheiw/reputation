@@ -1,7 +1,8 @@
 source("function.R")
 require(quanteda)
 
-country <- c("id")
+#country <- c("id", "my", "vn", "cn", "ph")
+country <- c("vn")
 for (u in country) {
   year <- get_years()
   dates <- get_date_range(paste0(min(year), "-01-01"), paste0(max(year), "-12-31"), unit = "month", size = 1)
@@ -33,8 +34,10 @@ for (u in country) {
     # # remove caption
     # corp[] <- stri_replace_all_regex(corp[], "\\[caption .*?\\].*?\\[\\/caption\\]", " ")
     # 
+
+    conc <- ifelse(get_language(u) %in% c("zh", "ja"), "", " ")
     toks <- tokens(corp, split_hyphens = TRUE, normalize = TRUE,
-                   concatenator = " ")
+                   concatenator = conc)
     # 
     # # measure noise
     # s <- ntoken(tokens_select(toks, stopwords("en")))

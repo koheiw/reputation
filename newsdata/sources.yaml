@@ -35,7 +35,11 @@ ps:
 ph: 
   - inquirer # Philippine Daily Inquirer (liberal)
   - mb # Manila Bulletin (pro-government)
-  - bandera_inquirer
+  - philstar
+  - rappler
+  #- bandera_inquirer # Filipino
+  #- tribune # Filipino
+
 id: 
   - mediaindonesia # Media Indonasia
   - republikain # Republika
@@ -57,8 +61,8 @@ vn:
 
   
 cn:
-  - 81cn
-  - voc_cn
+  - 81cn # Chinese Military
+  - voc_cn # Voice of China
   - people_cn
   - bjnews
   # - en_people_cn # English

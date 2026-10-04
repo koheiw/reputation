@@ -9,8 +9,8 @@ con <- mongo("newsdata", db = "reputation", url = URL_MONGO)
 sources <- yaml::read_yaml("newsdata/sources.yaml")
 
 #country <- c("ir", "lb", "iq", "il", "ps")
-#country <- "cn"
-country <- c("my", "vn", "id", "ph")
+#country <- c("ph", "my", "vn", "id", "cn")
+country <- "vn"
 for (u in country) {
   year <- get_years()
   dates <- get_date_range(paste0(min(year), "-01-01"), paste0(max(year), "-12-31"), unit = "month", size = 1)
@@ -22,8 +22,8 @@ for (u in country) {
     dir.create(paste0(DIR_DATA, "/corpus/", u), FALSE, TRUE)
     f <- paste0(DIR_DATA, "/corpus/", u, "/corpus_", from, "_", to, ".rds")
     if (file.exists(f)) {
-      #cat("Skip", u, format(from), format(to), "\n")
-      #next
+      cat("Skip", u, format(from), format(to), "\n")
+      next
     } else {
       cat("Export", u, format(from), format(to), "\n")
     }
